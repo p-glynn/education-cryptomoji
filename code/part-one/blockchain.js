@@ -96,7 +96,6 @@ class Blockchain {
      *   - blocks: an array of blocks, starting with one genesis block
      */
     constructor() {
-        // Your code here
         const genesisBlock = new Block([], null)
         this.blocks = [genesisBlock]
 

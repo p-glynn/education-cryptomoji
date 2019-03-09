@@ -3,7 +3,8 @@
 const {
     createHash
 } = require('crypto');
-const signing = require('./signing');
+// accepts public key, message, signature
+const { verify } = require('./signing');
 
 /**
  * A simple validation function for transactions. Accepts a transaction
@@ -13,9 +14,11 @@ const signing = require('./signing');
  *   - have been modified since signing
  */
 const isValidTransaction = transaction => {
-    // Enter your solution here
+    
     const { source, recipient, amount, signature } = transaction
+    console.log({transaction})
     if (amount < 0) return false
+    return true
 
 };
 

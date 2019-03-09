@@ -87,9 +87,9 @@ const sig = sign(privKey, 'Hello World')
  *   // false
  */
 const verify = (publicKey, message, signature) => {
-    //create hash
-    //append message
-    //convert to workable hex string
+    // create hash
+    // append message
+    // convert to workable hex string
     const hash = createHash('sha256')
     hash.update(message)
     const digest = hash.digest()
