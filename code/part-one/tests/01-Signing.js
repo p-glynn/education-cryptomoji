@@ -19,7 +19,7 @@ const randomString = () => {
     .replace(/[\/\+=]/g, '');
 };
 
-describe('Signing module', function() {
+xdescribe('Signing module', function() {
 
   describe('createPrivateKey', function() {
     let privateKey = null;

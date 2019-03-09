@@ -1,7 +1,12 @@
 'use strict';
 
-const { createHash } = require('crypto');
-const signing = require('./signing');
+const {
+    createHash
+} = require('crypto');
+const {
+    getPublicKey,
+    sign
+} = require('./signing');
 
 
 /**
@@ -9,59 +14,72 @@ const signing = require('./signing');
  * another public key.
  */
 class Transaction {
-  /**
-   * The constructor accepts a hex private key for the sender, a hex
-   * public key for the recipient, and a number amount. It will use these
-   * to set a number of properties, including a Secp256k1 signature.
-   *
-   * Properties:
-   *   - source: the public key derived from the provided private key
-   *   - recipient: the provided public key for the recipient
-   *   - amount: the provided amount
-   *   - signature: a unique signature generated from a combination of the
-   *     other properties, signed with the provided private key
-   */
-  constructor(privateKey, recipient, amount) {
-    // Enter your solution here
-
-  }
+    /**
+     * The constructor accepts a hex private key for the sender, a hex
+     * public key for the recipient, and a number amount. It will use these
+     * to set a number of properties, including a Secp256k1 signature.
+     *
+     * Properties:
+     *   - source: the public key derived from the provided private key
+     *   - recipient: the provided public key for the recipient
+     *   - amount: the provided amount
+     *   - signature: a unique signature generated from a combination of the
+     *     other properties, signed with the provided private key
+     */
+    constructor(privateKey, recipient, amount) {
+        this.source = getPublicKey(privateKey) // public key
+        this.recipient = recipient
+        this.amount = amount
+        const message = this.source + this.recipient + this.amount
+        this.signature = sign(privateKey, message)
+    }
 }
+
+
 
 /**
  * A Block class for storing an array of transactions and the hash of a
  * previous block. Includes a method to calculate and set its own hash.
  */
 class Block {
-  /**
-   * Accepts an array of transactions and the hash of a previous block. It
-   * saves these and uses them to calculate a hash.
-   *
-   * Properties:
-   *   - transactions: the passed in transactions
-   *   - previousHash: the passed in hash
-   *   - nonce: just set this to some hard-coded number for now, it will be
-   *     used later when we make blocks mineable with our own PoW algorithm
-   *   - hash: a unique hash string generated from the other properties
-   */
-  constructor(transactions, previousHash) {
-    // Your code here
+    /**
+     * Accepts an array of transactions and the hash of a previous block. It
+     * saves these and uses them to calculate a hash.
+     *
+     * Properties:
+     *   - transactions: the passed in transactions
+     *   - previousHash: the passed in hash
+     *   - nonce: just set this to some hard-coded number for now, it will be
+     *     used later when we make blocks mineable with our own PoW algorithm
+     *   - hash: a unique hash string generated from the other properties
+     */
+    constructor(transactions, previousHash) {
+        this.transactions = transactions
+        this.previousHash = previousHash
+        this.nonce = 42
+        this.calculateHash(this.nonce)
+    }
 
-  }
-
-  /**
-   * Accepts a nonce, and generates a unique hash for the block. Updates the
-   * hash and nonce properties of the block accordingly.
-   *
-   * Hint:
-   *   The format of the hash is up to you. Remember that it needs to be
-   *   unique and deterministic, and must become invalid if any of the block's
-   *   properties change.
-   */
-  calculateHash(nonce) {
-    // Your code here
-
-  }
+    /**
+     * Accepts a nonce, and generates a unique hash for the block. Updates the
+     * hash and nonce properties of the block accordingly.
+     *
+     * Hint:
+     *   The format of the hash is up to you. Remember that it needs to be
+     *   unique and deterministic, and must become invalid if any of the block's
+     *   properties change.
+     */
+    calculateHash(nonce) {
+        this.nonce = nonce
+        const data = nonce + this.transactions + this.previousHash
+        const hash = createHash('sha512')
+        hash.update(data)
+        const digest = hash.digest('hex')
+        this.hash = digest
+        return digest
+    }
 }
+
 
 /**
  * A Blockchain class for storing an array of blocks, each of which is linked
@@ -69,53 +87,67 @@ class Block {
  * fetching the head block, and checking the balances of public keys.
  */
 class Blockchain {
-  /**
-   * Generates a new blockchain with a single "genesis" block. This is the
-   * only block which may have no previous hash. It should have an empty
-   * transactions array, and `null` for the previous hash.
-   *
-   * Properties:
-   *   - blocks: an array of blocks, starting with one genesis block
-   */
-  constructor() {
-    // Your code here
+    /**
+     * Generates a new blockchain with a single "genesis" block. This is the
+     * only block which may have no previous hash. It should have an empty
+     * transactions array, and `null` for the previous hash.
+     *
+     * Properties:
+     *   - blocks: an array of blocks, starting with one genesis block
+     */
+    constructor() {
+        // Your code here
+        const genesisBlock = new Block([], null)
+        this.blocks = [genesisBlock]
 
-  }
+    }
 
-  /**
-   * Simply returns the last block added to the chain.
-   */
-  getHeadBlock() {
-    // Your code here
+    /**
+     * Simply returns the last block added to the chain.
+     */
+    getHeadBlock() {
+        // Your code here
+        return this.blocks[this.blocks.length - 1]
+    }
 
-  }
+    /**
+     * Accepts an array of transactions, creating a new block with them and
+     * adding it to the chain.
+     */
+    addBlock(transactions) {
+        const headBlock = this.getHeadBlock()
+        const { hash } = headBlock
+        const nextBlock = new Block(transactions, hash) 
+        this.blocks.push(nextBlock)
 
-  /**
-   * Accepts an array of transactions, creating a new block with them and
-   * adding it to the chain.
-   */
-  addBlock(transactions) {
-    // Your code here
+    }
 
-  }
-
-  /**
-   * Accepts a public key, calculating its "balance" based on the amounts
-   * transferred in all transactions stored in the chain.
-   *
-   * Note:
-   *   There is currently no way to create new funds on the chain, so some
-   *   keys will have a negative balance. That's okay, we'll address it when
-   *   we make the blockchain mineable later.
-   */
-  getBalance(publicKey) {
-    // Your code here
-
-  }
+    /**
+     * Accepts a public key, calculating its "balance" based on the amounts
+     * transferred in all transactions stored in the chain.
+     *
+     * Note:
+     *   There is currently no way to create new funds on the chain, so some
+     *   keys will have a negative balance. That's okay, we'll address it when
+     *   we make the blockchain mineable later.
+     */
+    getBalance(publicKey) {
+        let balance = 0
+        const headBlock = this.getHeadBlock()
+        const { transactions } = headBlock
+        for (let transaction of transactions) {
+            if (transaction.source === publicKey) {
+                balance -= transaction.amount
+            } else if (transaction.recipient === publicKey) {
+                balance += transaction.amount
+            }
+        }
+        return balance
+    }
 }
 
 module.exports = {
-  Transaction,
-  Block,
-  Blockchain
+    Transaction,
+    Block,
+    Blockchain
 };

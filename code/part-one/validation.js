@@ -1,6 +1,8 @@
 'use strict';
 
-const { createHash } = require('crypto');
+const {
+    createHash
+} = require('crypto');
 const signing = require('./signing');
 
 /**
@@ -11,7 +13,9 @@ const signing = require('./signing');
  *   - have been modified since signing
  */
 const isValidTransaction = transaction => {
-  // Enter your solution here
+    // Enter your solution here
+    const { source, recipient, amount, signature } = transaction
+    if (amount < 0) return false
 
 };
 
@@ -22,7 +26,7 @@ const isValidTransaction = transaction => {
  *   - they contain any invalid transactions
  */
 const isValidBlock = block => {
-  // Your code here
+    // Your code here
 
 };
 
@@ -37,7 +41,7 @@ const isValidBlock = block => {
  *   - contains any invalid transactions
  */
 const isValidChain = blockchain => {
-  // Your code here
+    // Your code here
 
 };
 
@@ -47,13 +51,13 @@ const isValidChain = blockchain => {
  * (in theory) make the blockchain fail later validation checks;
  */
 const breakChain = blockchain => {
-  // Your code here
+    // Your code here
 
 };
 
 module.exports = {
-  isValidTransaction,
-  isValidBlock,
-  isValidChain,
-  breakChain
+    isValidTransaction,
+    isValidBlock,
+    isValidChain,
+    breakChain
 };
