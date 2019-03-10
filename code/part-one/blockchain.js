@@ -70,7 +70,6 @@ class Block {
      *   properties change.
      */
     calculateHash(nonce) {
-        this.nonce = nonce
         const data = nonce + this.transactions + this.previousHash
         const hash = createHash('sha512')
         hash.update(data)
